@@ -108,8 +108,8 @@ export default function MarketTickerBar() {
   }, [flash, items]);
 
   return (
-    <div className="sticky top-16 z-40 w-full border-b border-gray-200 bg-white/95 backdrop-blur">
-      <div className="w-full overflow-hidden px-0 py-2">
+    <div className="ticker-shell sticky top-16 z-40 w-full border-b border-gray-200 bg-white/95 backdrop-blur">
+      <div className="ticker-inner w-full overflow-hidden py-2">
         {loading && items.length === 0 ? (
           <div className="flex gap-2">
             {Array.from({ length: 7 }).map((_, idx) => (

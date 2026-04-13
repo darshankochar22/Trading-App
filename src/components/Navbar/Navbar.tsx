@@ -31,12 +31,12 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="sticky top-0 z-50 w-full overflow-hidden border-b border-white/10 bg-black/95 backdrop-blur-md">
+    <nav className="navbar-shell sticky top-0 z-50 w-full overflow-hidden border-b border-white/10 bg-black/95 backdrop-blur-md">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(16,185,129,0.12),transparent)]"
         aria-hidden
       />
-      <div className="relative mx-auto grid h-16 w-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-6">
+      <div className="navbar-inner relative grid h-16 w-full grid-cols-[1fr_auto_1fr] items-center">
         {/* Logo Section */}
         <span className="justify-self-start text-sm font-semibold text-white">Stellar</span>
         {/* Navigation Links */}

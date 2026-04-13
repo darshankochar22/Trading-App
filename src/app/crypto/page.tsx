@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import Navbar from "@/components/Navbar/Navbar";
+import AppTopShell from "@/components/layout/AppTopShell";
+import AppContainer from "@/components/ui/AppContainer";
 
 type MarketRow = {
   symbol: string;
@@ -184,9 +185,9 @@ export default function CryptoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black">
-      <Navbar />
-      <main className="mx-auto w-full max-w-7xl px-6 py-8">
+    <div className="app-page">
+      <AppTopShell showTicker={false} />
+      <AppContainer as="main" className="max-w-7xl py-8">
         <section className="rounded-2xl border border-gray-200 bg-black p-6 text-white">
           <p className="text-xs uppercase tracking-[0.22em] text-gray-300">Crypto Exchange</p>
           <h1 className="mt-2 text-3xl font-semibold">Integrated Crypto Trading</h1>
@@ -366,7 +367,7 @@ export default function CryptoPage() {
             </table>
           </div>
         </section>
-      </main>
+      </AppContainer>
     </div>
   );
 }

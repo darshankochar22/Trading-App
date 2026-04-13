@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import DashboardHero from "@/components/dashboard/DashboardHero";
+import AppContainer from "@/components/ui/AppContainer";
 import MarketIndexCard from "@/components/ui/MarketIndexCard";
 import MarketTable from "@/components/ui/MarketTable";
 import MoversList from "@/components/ui/MoversList";
@@ -10,7 +11,6 @@ import type {
   MarketIndex,
   MarketOverviewResponse,
   MarketStock,
-  StraddleRow,
 } from "@/types/market";
 import type { TradingStats } from "@/types/trading";
 
@@ -18,7 +18,6 @@ export default function DashboardPage() {
   const [indices, setIndices] = useState<MarketIndex[]>([]);
   const [stocks, setStocks] = useState<MarketStock[]>([]);
   const [ipos, setIpos] = useState<IpoItem[]>([]);
-  const [straddleRows, setStraddleRows] = useState<StraddleRow[]>([]);
   const [asOf, setAsOf] = useState<string>("");
   const [stats, setStats] = useState<TradingStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,16 +30,14 @@ export default function DashboardPage() {
       try {
         setLoading(true);
         setError(null);
-        const [overviewRes, ipoRes, statsRes, straddleRes] = await Promise.all([
+        const [overviewRes, ipoRes, statsRes] = await Promise.all([
           fetch("/api/market/overview", { cache: "no-store" }),
           fetch("/api/market/ipos", { cache: "no-store" }),
           fetch("/api/trading/stats", { cache: "no-store" }),
-          fetch("/api/market/straddle", { cache: "no-store" }),
         ]);
         const json: MarketOverviewResponse = await overviewRes.json();
         const ipoJson = await ipoRes.json();
         const statsJson = await statsRes.json();
-        const straddleJson = await straddleRes.json();
         if (!overviewRes.ok || !json.ok) {
           throw new Error(json.message ?? "Failed to load market overview");
         }
@@ -51,9 +48,6 @@ export default function DashboardPage() {
         setAsOf(json.asOf);
         if (statsJson?.ok && statsJson.data) {
           setStats(statsJson.data);
-        }
-        if (straddleJson?.ok) {
-          setStraddleRows(straddleJson.rows ?? []);
         }
       } catch (err) {
         if (!active) return;
@@ -79,44 +73,18 @@ export default function DashboardPage() {
     () => [...stocks].sort((a, b) => a.pChange - b.pChange).slice(0, 5),
     [stocks],
   );
-  const topStraddles = useMemo(
-    () =>
-      [...straddleRows]
-        .sort((a, b) => b.straddlePrice - a.straddlePrice)
-        .slice(0, 8),
-    [straddleRows],
-  );
-  const maxStraddle = useMemo(
-    () =>
-      topStraddles.length
-        ? Math.max(...topStraddles.map((r) => r.straddlePrice))
-        : 1,
-    [topStraddles],
-  );
-
   return (
-    <main className="mx-auto w-full max-w-7xl px-6 py-8">
-      <div className="rounded-2xl border border-gray-200 bg-black p-6 text-white shadow-sm">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-200">
-          Live Markets
-        </p>
-        <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold sm:text-3xl">
-              Indian Market Overview
-            </h1>
-            <p className="mt-1 text-sm text-slate-200">
-              NIFTY, SENSEX, sector indices, daily movers, broader companies,
-              and IPO updates.
-            </p>
-          </div>
+    <AppContainer as="main" className="max-w-7xl py-8">
+      <DashboardHero
+        eyebrow="Live Markets"
+        title="Indian Market Overview"
+        description="NIFTY, SENSEX, sector indices, daily movers, broader companies, and IPO updates."
+        rightSlot={(
           <div className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-slate-100">
-            {asOf
-              ? `Updated ${new Date(asOf).toLocaleTimeString()}`
-              : "Updating..."}
+            {asOf ? `Updated ${new Date(asOf).toLocaleTimeString()}` : "Updating..."}
           </div>
-        </div>
-      </div>
+        )}
+      />
 
       {stats ? (
         <div className="mt-4 flex flex-wrap gap-2 text-xs text-gray-700">
@@ -211,6 +179,6 @@ export default function DashboardPage() {
           </ul>
         </article>
       </section>
-    </main>
+    </AppContainer>
   );
 }

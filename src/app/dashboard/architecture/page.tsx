@@ -1,30 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import DashboardHero from "@/components/dashboard/DashboardHero";
+import AppContainer from "@/components/ui/AppContainer";
 
 export default function ArchitecturePage() {
   return (
-    <main className="mx-auto w-full max-w-[1700px] px-6 py-10">
-      <section className="rounded-2xl border border-black bg-white p-6">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-gray-700">
-              Architecture
-            </p>
-            <h1 className="mt-2 text-2xl font-semibold text-black sm:text-3xl">
-              Application Architecture Blueprint
-            </h1>
-            <p className="mt-1 text-sm text-gray-700">
-              Complete end-to-end view with layered components, data flow, and supporting platform services.
-            </p>
-          </div>
-          <Link
-            href="/dashboard/mutual-funds"
-            className="rounded-lg border border-black px-4 py-2 text-sm text-black hover:bg-gray-50"
-          >
-            Back to Mutual Funds
-          </Link>
-        </div>
+    <AppContainer as="main" className="max-w-[1700px] py-10">
+      <section className="app-card rounded-2xl p-6">
+        <DashboardHero
+          eyebrow="Architecture"
+          title="Application Architecture Blueprint"
+          description="Complete end-to-end view with layered components, data flow, and supporting platform services."
+          actions={(
+            <Link href="/dashboard/mutual-funds" className="app-btn app-btn-secondary border-white/30 bg-white/5 text-white hover:bg-white/10">
+              Back to Mutual Funds
+            </Link>
+          )}
+          className="mb-5"
+        />
 
         <div className="mt-4 rounded-xl border border-black/20 p-3 text-xs text-gray-700">
           Left-to-right main flow: Channels -&gt; Frontend -&gt; API Routes -&gt; Domain Services -&gt; Data &amp; Integrations. Supporting
@@ -529,6 +523,6 @@ export default function ArchitecturePage() {
           </div>
         </div>
       </section>
-    </main>
+    </AppContainer>
   );
 }

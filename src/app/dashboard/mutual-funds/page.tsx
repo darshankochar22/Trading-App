@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import DashboardHero from "@/components/dashboard/DashboardHero";
+import AppContainer from "@/components/ui/AppContainer";
 import type { MutualFundItem, MutualFundMetrics } from "@/types/market";
 
 type MfApi = {
@@ -269,7 +271,7 @@ export default function MutualFundsPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-6 py-10">
+    <AppContainer as="main" className="max-w-7xl py-10">
       {upiOpen ? (
         <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-xl">
@@ -398,36 +400,21 @@ export default function MutualFundsPage() {
         </div>
       ) : null}
 
-      <div className="rounded-2xl border border-gray-200 bg-black p-6 text-white shadow-sm">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-200">
-          Mutual Funds
-        </p>
-        <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold sm:text-3xl">
-              SIP Planner & Fund Discovery
-            </h1>
-            <p className="mt-1 text-sm text-slate-200">
-              Professional mutual fund section with SIP projection and
-              searchable fund universe.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link
-              href="/dashboard/architecture"
-              className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
-            >
+      <DashboardHero
+        eyebrow="Mutual Funds"
+        title="SIP Planner and Fund Discovery"
+        description="Professional mutual fund section with SIP projection and searchable fund universe."
+        actions={(
+          <>
+            <Link href="/dashboard/architecture" className="app-btn app-btn-secondary border-white/30 bg-white/5 text-white hover:bg-white/10">
               Architecture
             </Link>
-            <Link
-              href="/dashboard"
-              className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
-            >
+            <Link href="/dashboard" className="app-btn app-btn-secondary border-white/30 bg-white/5 text-white hover:bg-white/10">
               Back to Dashboard
             </Link>
-          </div>
-        </div>
-      </div>
+          </>
+        )}
+      />
 
       <section className="mt-6 grid gap-4 lg:grid-cols-[380px_1fr]">
         <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -728,6 +715,6 @@ export default function MutualFundsPage() {
           </table>
         </div>
       </section>
-    </main>
+    </AppContainer>
   );
 }

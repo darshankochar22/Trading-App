@@ -1,12 +1,10 @@
 import type { ReactNode } from "react";
-import Navbar from "@/components/Navbar/Navbar";
-import MarketTickerBar from "@/components/market/MarketTickerBar";
+import AppTopShell from "@/components/layout/AppTopShell";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-white text-black">
-      <Navbar />
-      <MarketTickerBar />
+    <div className="app-page">
+      <AppTopShell />
       {children}
     </div>
   );

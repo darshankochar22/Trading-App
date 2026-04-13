@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import DashboardHero from "@/components/dashboard/DashboardHero";
+import AppContainer from "@/components/ui/AppContainer";
 import type { PortfolioSnapshot } from "@/types/trading";
 
 export default function PortfolioPage() {
@@ -34,9 +36,12 @@ export default function PortfolioPage() {
   }, []);
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-6 py-10">
-      <h1 className="text-2xl font-semibold text-black">Portfolio</h1>
-      <p className="mt-1 text-sm text-gray-600">Track holdings, P&L, and cash from executed trades.</p>
+    <AppContainer as="main" className="max-w-7xl py-10">
+      <DashboardHero
+        eyebrow="Portfolio Intelligence"
+        title="Portfolio"
+        description="Track holdings, P&L, and cash from executed trades with live updates."
+      />
       <p className="mt-2 inline-flex rounded-full border border-gray-200 bg-white px-3 py-1 text-xs text-gray-700 shadow-sm">
         Auto-refresh every 8s
       </p>
@@ -93,7 +98,7 @@ export default function PortfolioPage() {
       ) : (
         <p className="mt-6 text-sm text-gray-500">No portfolio data yet.</p>
       )}
-    </main>
+    </AppContainer>
   );
 }
 

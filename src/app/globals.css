@@ -2,7 +2,20 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0a0a0a;
+  --ink: #0a0a0a;
+  --ink2: #3d3d3d;
+  --ink3: #6b6b6b;
+  --ink4: #9b9b9b;
+  --rule: rgba(0, 0, 0, 0.08);
+  --rule-strong: rgba(0, 0, 0, 0.13);
+  --surface: #f7f7f5;
+  --brand: #008060;
+  --brand-soft: #f0faf5;
+  --brand-border: #b6e4cc;
+  --danger: #c0392b;
+  --danger-soft: #fff5f5;
+  --danger-border: #ffd0cc;
 }
 
 @theme inline {
@@ -15,7 +28,163 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-instrument-serif), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+p {
+  color: var(--ink2);
+}
+
+main {
+  color: var(--ink);
+}
+
+section {
+  border-color: var(--rule);
+}
+
+a {
+  transition: color 0.2s ease;
+}
+
+/* App-wide landing-style primitives */
+.app-page {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--ink);
+}
+
+.app-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.app-section {
+  padding: 1.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.app-section + .app-section {
+  margin-top: 1rem;
+}
+
+.app-card {
+  border: 1px solid var(--rule);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+}
+
+.app-card-elevated {
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+}
+
+.app-heading-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+.app-display {
+  font-family: var(--font-instrument-serif), Georgia, serif;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+.app-muted {
+  color: var(--ink3);
+}
+
+.app-muted-surface {
+  background: var(--surface);
+}
+
+.app-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 0.65rem;
+  padding: 0.62rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition: all 0.18s ease;
+}
+
+.app-btn-primary {
+  background: var(--ink);
+  color: #fff;
+}
+
+.app-btn-primary:hover {
+  background: #222;
+}
+
+.app-btn-secondary {
+  background: #fff;
+  color: var(--ink2);
+  border-color: var(--rule-strong);
+}
+
+.app-btn-secondary:hover {
+  background: var(--surface);
+}
+
+.app-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  border-radius: 0.45rem;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.68rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  border: 1px solid var(--rule);
+}
+
+.app-badge-success {
+  color: var(--brand);
+  background: var(--brand-soft);
+  border-color: var(--brand-border);
+}
+
+.app-badge-danger {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: var(--danger-border);
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    padding: 1.25rem 1rem;
+  }
 }
 
 .ticker-marquee {
@@ -33,6 +202,35 @@ body {
 
 .ticker-marquee:hover .ticker-track {
   animation-play-state: paused;
+}
+
+/* Hard alignment overrides for global shell components */
+.navbar-inner,
+.ticker-inner,
+.footer-inner {
+  max-width: 1200px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+
+.ticker-inner {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+.footer-shell {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 768px) {
+  .navbar-inner,
+  .ticker-inner,
+  .footer-inner {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
 }
 
 @keyframes ticker-slide {

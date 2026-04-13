@@ -136,7 +136,7 @@ export default function HomeActionHub() {
     <section className="mt-10 grid gap-4 lg:grid-cols-2">
       {upiOpen ? (
         <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-xl">
+          <div className="app-card-elevated w-full max-w-md rounded-2xl p-5 shadow-xl">
             {upiStep === "pin" ? (
               <>
                 <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">UPI Confirmation</p>
@@ -162,18 +162,18 @@ export default function HomeActionHub() {
                       key={`qt-key-${digit}`}
                       type="button"
                       onClick={() => pressPinDigit(digit)}
-                      className="rounded-lg border border-gray-200 bg-white py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
+                      className="app-btn app-btn-secondary py-2 text-sm text-gray-900"
                     >
                       {digit}
                     </button>
                   ))}
-                  <button type="button" onClick={clearPin} className="rounded-lg border border-gray-200 bg-white py-2 text-xs font-medium text-gray-700 hover:bg-gray-50">
+                  <button type="button" onClick={clearPin} className="app-btn app-btn-secondary py-2 text-xs text-gray-700">
                     Clear
                   </button>
-                  <button type="button" onClick={() => pressPinDigit("0")} className="rounded-lg border border-gray-200 bg-white py-2 text-sm font-medium text-gray-900 hover:bg-gray-50">
+                  <button type="button" onClick={() => pressPinDigit("0")} className="app-btn app-btn-secondary py-2 text-sm text-gray-900">
                     0
                   </button>
-                  <button type="button" onClick={backspacePin} className="rounded-lg border border-gray-200 bg-white py-2 text-xs font-medium text-gray-700 hover:bg-gray-50">
+                  <button type="button" onClick={backspacePin} className="app-btn app-btn-secondary py-2 text-xs text-gray-700">
                     ⌫
                   </button>
                 </div>
@@ -185,7 +185,7 @@ export default function HomeActionHub() {
                     type="button"
                     onClick={() => void confirmTradeUpi()}
                     disabled={upiPin.length < 4}
-                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="app-btn app-btn-primary px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Confirm Trade
                   </button>
@@ -209,12 +209,12 @@ export default function HomeActionHub() {
         </div>
       ) : null}
 
-      <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <article className="app-card rounded-2xl p-5 shadow-sm">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-gray-900">Quick Trade</h3>
           <Link
             href="/dashboard/trade"
-            className="text-xs font-medium text-blue-600 hover:underline"
+            className="text-xs font-medium text-(--brand) hover:underline"
           >
             Open full terminal
           </Link>
@@ -249,14 +249,14 @@ export default function HomeActionHub() {
         ) : null}
       </article>
 
-      <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <article className="app-card rounded-2xl p-5 shadow-sm">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-gray-900">
             Portfolio Snapshot
           </h3>
           <Link
             href="/dashboard/portfolio"
-            className="text-xs font-medium text-blue-600 hover:underline"
+            className="text-xs font-medium text-(--brand) hover:underline"
           >
             Open portfolio
           </Link>
@@ -294,14 +294,14 @@ export default function HomeActionHub() {
         </div>
       </article>
 
-      <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <article className="app-card rounded-2xl p-5 shadow-sm">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-gray-900">
             Orders & Trades Pulse
           </h3>
           <Link
             href="/dashboard/orders"
-            className="text-xs font-medium text-blue-600 hover:underline"
+            className="text-xs font-medium text-(--brand) hover:underline"
           >
             Open order book
           </Link>
@@ -328,12 +328,12 @@ export default function HomeActionHub() {
         </div>
       </article>
 
-      <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <article className="app-card rounded-2xl p-5 shadow-sm">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-gray-900">IPO Pulse</h2>
           <Link
             href="/dashboard/mutual-funds"
-            className="text-xs font-medium text-blue-600 hover:underline"
+            className="text-xs font-medium text-(--brand) hover:underline"
           >
             Explore funds & SIP
           </Link>

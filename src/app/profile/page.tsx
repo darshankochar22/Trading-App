@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import MarketTickerBar from "@/components/market/MarketTickerBar";
-import Navbar from "@/components/Navbar/Navbar";
+import AppTopShell from "@/components/layout/AppTopShell";
+import AppContainer from "@/components/ui/AppContainer";
 import type { PortfolioSnapshot, TradingStats } from "@/types/trading";
 
 type ProfileApi = {
@@ -144,11 +144,9 @@ export default function ProfilePage() {
   }, [dbProfile?.stats.activeAlerts, profile]);
 
   return (
-    <div className="min-h-screen bg-white text-black">
-      <Navbar />
-      <MarketTickerBar />
-
-      <main className="mx-auto w-full max-w-7xl px-6 py-12">
+    <div className="app-page">
+      <AppTopShell />
+      <AppContainer as="main" className="max-w-7xl py-12">
         {isAuthed === false ? (
           <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
             <h1 className="text-xl font-semibold text-gray-900">Login required</h1>
@@ -363,7 +361,7 @@ export default function ProfilePage() {
             </ul>
           </article>
         </section>
-      </main>
+      </AppContainer>
     </div>
   );
 }

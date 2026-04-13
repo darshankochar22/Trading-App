@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import DashboardHero from "@/components/dashboard/DashboardHero";
+import AppContainer from "@/components/ui/AppContainer";
 import MarketDepthWidget from "@/components/ui/MarketDepthWidget";
 import type { MarketOverviewResponse } from "@/types/market";
 import type { InstrumentType, OrderType, Side, TradeSegment } from "@/types/trading";
@@ -139,7 +141,7 @@ export default function TradePage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-6 py-10">
+    <AppContainer as="main" className="max-w-7xl py-10">
       {upiOpen ? (
         <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-xl">
@@ -215,8 +217,11 @@ export default function TradePage() {
         </div>
       ) : null}
 
-      <h1 className="text-2xl font-semibold text-black">Trade Terminal</h1>
-      <p className="mt-1 text-sm text-gray-600">Step-by-step flow for Equity and Commodity trading (Cash / Futures / Options).</p>
+      <DashboardHero
+        eyebrow="Execution Workspace"
+        title="Trade Terminal"
+        description="Step-by-step flow for Equity and Commodity trading across Cash, Futures, and Options."
+      />
 
       <section className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr]">
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -425,6 +430,6 @@ export default function TradePage() {
           </div>
         </div>
       </section>
-    </main>
+    </AppContainer>
   );
 }

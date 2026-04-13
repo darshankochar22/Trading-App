@@ -345,7 +345,7 @@ export default function AutomationPanel() {
 
       {pickerOpen ? (
         <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-2xl border border-gray-200 bg-white p-5 shadow-xl">
+          <div className="app-card-elevated w-full max-w-2xl rounded-2xl p-5 shadow-xl">
             <div className="flex items-center justify-between gap-2">
               <h3 className="text-sm font-semibold text-gray-900">Select Companies</h3>
               <button
@@ -560,7 +560,7 @@ export default function AutomationPanel() {
                 <button
                   type="button"
                   onClick={() => setPickerOpen(true)}
-                  className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 hover:bg-gray-50"
+                  className="app-btn app-btn-secondary px-3 py-2 text-xs font-semibold text-gray-800"
                 >
                   Select Companies
                 </button>
@@ -617,7 +617,7 @@ export default function AutomationPanel() {
               type="button"
               onClick={() => void startEngine()}
               disabled={busyAction !== null}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+              className="app-btn app-btn-primary px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
             >
               {busyAction === "start" ? "Starting..." : "Start Engine"}
             </button>
@@ -625,7 +625,7 @@ export default function AutomationPanel() {
               type="button"
               onClick={() => void stopEngine()}
               disabled={busyAction !== null}
-              className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="app-btn app-btn-secondary px-4 py-2 text-sm font-semibold text-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {busyAction === "stop" ? "Stopping..." : "Stop Engine"}
             </button>

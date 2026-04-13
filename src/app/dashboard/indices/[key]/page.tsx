@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import DashboardHero from "@/components/dashboard/DashboardHero";
+import AppContainer from "@/components/ui/AppContainer";
 import MarketTable from "@/components/ui/MarketTable";
 import type { MarketStock } from "@/types/market";
 
@@ -74,31 +76,22 @@ export default function IndexDetailsPage() {
   const topLosers = useMemo(() => [...stocks].sort((a, b) => a.pChange - b.pChange).slice(0, 5), [stocks]);
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-6 py-10">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-gray-500">Index</p>
-          <h1 className="mt-2 text-2xl font-semibold text-gray-900">{name}</h1>
-          <p className="mt-1 text-sm text-gray-600">
-            Constituents, movers, and market breadth from NSE.{" "}
-            {asOf ? `Updated ${new Date(asOf).toLocaleTimeString()}` : null}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Link
-            href="/dashboard"
-            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
-          >
-            Back to dashboard
-          </Link>
-          <Link
-            href="/dashboard/trade"
-            className="rounded-lg bg-black px-3 py-2 text-sm font-medium text-white hover:bg-zinc-900"
-          >
-            Open trade
-          </Link>
-        </div>
-      </div>
+    <AppContainer as="main" className="max-w-7xl py-10">
+      <DashboardHero
+        eyebrow="Index"
+        title={name}
+        description={`Constituents, movers, and market breadth from NSE.${asOf ? ` Updated ${new Date(asOf).toLocaleTimeString()}` : ""}`}
+        actions={(
+          <>
+            <Link href="/dashboard" className="app-btn app-btn-secondary border-white/30 bg-white/5 text-white hover:bg-white/10">
+              Back to Dashboard
+            </Link>
+            <Link href="/dashboard/trade" className="app-btn bg-white text-black hover:bg-slate-100">
+              Open Trade
+            </Link>
+          </>
+        )}
+      />
 
       {error ? (
         <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
@@ -167,7 +160,7 @@ export default function IndexDetailsPage() {
           <MarketTable items={stocks} title={`${name} Constituents`} />
         )}
       </section>
-    </main>
+    </AppContainer>
   );
 }
 

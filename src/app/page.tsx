@@ -1,7 +1,6 @@
 "use client";
 
-import Navbar from "@/components/Navbar/Navbar";
-import MarketTickerBar from "@/components/market/MarketTickerBar";
+import AppTopShell from "@/components/layout/AppTopShell";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -114,58 +113,6 @@ const G = () => (
 
     .bar-wrap{display:flex;align-items:flex-end;gap:3px;height:40px}
     .bar{border-radius:2px 2px 0 0}
-    .landing-top-shell{
-      position:sticky;
-      top:0;
-      z-index:70;
-      width:100%;
-      background:var(--white);
-      border-bottom:1px solid var(--rule);
-    }
-    .landing-top-shell nav > div{
-      max-width:1200px;
-      margin:0 auto;
-      padding-left:24px;
-      padding-right:24px;
-    }
-    @media(max-width:768px){
-      .landing-top-shell nav > div{
-        padding-left:16px;
-        padding-right:16px;
-      }
-    }
-    .landing-top-shell > div > div{
-      max-width:none;
-      width:100%;
-      margin:0 auto;
-      padding-left:0;
-      padding-right:0;
-      padding-top:7px;
-      padding-bottom:7px;
-    }
-    .landing-top-shell > div > div > div{
-      max-width:100%;
-      width:100%;
-      margin:0 auto;
-      padding-left:0;
-      padding-right:0;
-    }
-    @media(max-width:768px){
-      .landing-top-shell > div > div{
-        padding-left:0;
-        padding-right:0;
-      }
-    }
-    .landing-top-shell > nav{
-      position:relative !important;
-      top:auto !important;
-      z-index:50 !important;
-    }
-    .landing-top-shell > div{
-      position:relative !important;
-      top:auto !important;
-      z-index:40 !important;
-    }
     .landing-page-body{padding-bottom:18px}
     ::-webkit-scrollbar{width:0}
   `}</style>
@@ -450,14 +397,7 @@ export default function Home() {
     <>
       <G />
       <div style={{ minHeight: "100vh", background: "var(--white)" }}>
-        <div className="landing-top-shell">
-          <div className="w-full">
-            <Navbar />
-          </div>
-          <div className="w-full">
-            <MarketTickerBar />
-          </div>
-        </div>
+        <AppTopShell />
         <div className="landing-page-body">
           {/* ═══ HERO ═══ */}
           <section

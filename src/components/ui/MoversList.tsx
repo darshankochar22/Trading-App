@@ -8,7 +8,7 @@ type Props = {
 
 export default function MoversList({ title, items, positive }: Props) {
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+    <section className="app-card rounded-2xl p-4 shadow-sm">
       <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
       <ul className="mt-3 space-y-2">
         {items.map((s) => (

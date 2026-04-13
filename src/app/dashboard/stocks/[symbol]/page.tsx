@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import DashboardHero from "@/components/dashboard/DashboardHero";
+import AppContainer from "@/components/ui/AppContainer";
 import MarketDepthWidget from "@/components/ui/MarketDepthWidget";
 import type { MarketDepth, MarketHistoryPoint } from "@/types/market";
 
@@ -60,16 +62,17 @@ export default function StockChartPage() {
   const latest = history[history.length - 1]?.close ?? 0;
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-6 py-10">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-black">{symbol} Chart</h1>
-          <p className="mt-1 text-sm text-gray-600">Historical close prices with live depth data.</p>
-        </div>
-        <Link href="/dashboard/trade" className="rounded-lg border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50">
-          Back to Trade
-        </Link>
-      </div>
+    <AppContainer as="main" className="max-w-7xl py-10">
+      <DashboardHero
+        eyebrow="Stock Detail"
+        title={`${symbol} Chart`}
+        description="Historical close prices with live depth data."
+        actions={(
+          <Link href="/dashboard/trade" className="app-btn app-btn-secondary border-white/30 bg-white/5 text-white hover:bg-white/10">
+            Back to Trade
+          </Link>
+        )}
+      />
 
       {error ? (
         <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -96,7 +99,7 @@ export default function StockChartPage() {
       <div className="mt-6">
         <MarketDepthWidget depth={depth} loading={loading && !depth} />
       </div>
-    </main>
+    </AppContainer>
   );
 }
 

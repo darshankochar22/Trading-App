@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import Navbar from "@/components/Navbar/Navbar";
-import MarketTickerBar from "@/components/market/MarketTickerBar";
+import AppTopShell from "@/components/layout/AppTopShell";
+import AppContainer from "@/components/ui/AppContainer";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,11 +36,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black">
-      <Navbar />
-      <MarketTickerBar />
-
-      <main className="mx-auto w-full max-w-md px-6 py-12">
+    <div className="app-page">
+      <AppTopShell />
+      <AppContainer as="main" className="max-w-md py-12">
         <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
           <h1 className="text-xl font-semibold text-gray-900">Login</h1>
           <p className="mt-1 text-sm text-gray-600">Use your email and password.</p>
@@ -82,7 +80,7 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
-      </main>
+      </AppContainer>
     </div>
   );
 }

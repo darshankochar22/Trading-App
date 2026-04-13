@@ -28,13 +28,13 @@ const links = {
 
 export default function Footer() {
   return (
-    <footer className="mt-auto w-full bg-zinc-950 text-white">
+    <footer className="footer-shell mt-auto w-full bg-zinc-950 text-white">
       <div className="relative overflow-hidden">
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(16,185,129,0.14),transparent)]"
           aria-hidden
         />
-        <div className="relative mx-auto max-w-7xl px-6 pb-16 pt-16 sm:pb-20 sm:pt-20">
+        <div className="footer-inner relative pb-16 pt-16 sm:pb-20 sm:pt-20">
           <div className="grid gap-10 lg:grid-cols-[1.25fr_0.75fr_0.75fr_0.75fr_0.75fr]">
             <div>
               <div className="flex items-center gap-3">

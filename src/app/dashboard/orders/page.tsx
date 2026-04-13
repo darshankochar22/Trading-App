@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import DashboardHero from "@/components/dashboard/DashboardHero";
+import AppContainer from "@/components/ui/AppContainer";
 import type { ExecutedTrade, TradeOrder } from "@/types/trading";
 
 export default function OrdersPage() {
@@ -59,9 +61,12 @@ export default function OrdersPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-6 py-10">
-      <h1 className="text-2xl font-semibold text-black">Orders & Trades</h1>
-      <p className="mt-1 text-sm text-gray-600">Track open orders, executions, and order lifecycle.</p>
+    <AppContainer as="main" className="max-w-7xl py-10">
+      <DashboardHero
+        eyebrow="Execution Log"
+        title="Orders and Trades"
+        description="Track open orders, executions, and complete order lifecycle in one place."
+      />
       <div className="mt-3 flex flex-wrap gap-2 text-xs text-gray-700">
         <span className="rounded-full border border-gray-200 bg-white px-3 py-1.5 shadow-sm">
           Auto-refresh: every 8s
@@ -157,6 +162,6 @@ export default function OrdersPage() {
           </table>
         </div>
       </section>
-    </main>
+    </AppContainer>
   );
 }
