@@ -296,10 +296,13 @@ export async function fetchMutualFundList(limit = 30, q = ""): Promise<MutualFun
   const filtered = query
     ? json.filter((item) => item.schemeName.toLowerCase().includes(query))
     : json;
-  return filtered.slice(0, limit).map((m) => ({
-    code: m.schemeCode,
-    schemeName: m.schemeName,
-  }));
+  return filtered
+    .map((m) => ({
+      code: String((m as { schemeCode?: unknown }).schemeCode ?? "").trim(),
+      schemeName: String((m as { schemeName?: unknown }).schemeName ?? "").trim(),
+    }))
+    .filter((m) => Boolean(m.code) && Boolean(m.schemeName))
+    .slice(0, limit);
 }
 
 function parseMfDate(raw: string): number {

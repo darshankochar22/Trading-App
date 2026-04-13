@@ -190,6 +190,12 @@ export default function MutualFundsPage() {
       setSipError("Please login to start SIP plans.");
       return;
     }
+    const normalizedCode = String((fund as { code?: unknown }).code ?? "").trim();
+    const normalizedName = String((fund as { schemeName?: unknown }).schemeName ?? "").trim();
+    if (!normalizedCode || !normalizedName) {
+      setSipError("Selected fund is missing code/name. Please pick another fund.");
+      return;
+    }
     setSipError(null);
     setSipSuccess(null);
     setSelectedFund(fund);
@@ -201,6 +207,13 @@ export default function MutualFundsPage() {
 
   async function confirmUpiAndCreateSip() {
     if (!selectedFund) return;
+    const fundCode = String((selectedFund as { code?: unknown }).code ?? "").trim();
+    const fundName = String((selectedFund as { schemeName?: unknown }).schemeName ?? "").trim();
+    if (!fundCode || !fundName) {
+      setUpiOpen(false);
+      setSipError("Selected fund is missing code/name. Please select the fund again.");
+      return;
+    }
     setUpiStep("processing");
     await new Promise((resolve) => setTimeout(resolve, 1200));
     try {
@@ -208,8 +221,8 @@ export default function MutualFundsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fundCode: selectedFund.code,
-          fundName: selectedFund.schemeName,
+          fundCode,
+          fundName,
           monthlyAmount: Number(monthlySip),
           expectedAnnualReturn: Number(annualReturn),
           dayOfMonth: Number(dayOfMonth),
