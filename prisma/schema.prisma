@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  profile      Profile?
+  account      Account?
+  alerts       PriceAlert[]
+  orders       TradeOrder[]
+  trades       ExecutedTrade[]
+  holdings     Holding[]
+  sessions     Session[]
+  sipPlans     SipPlan[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  plan      String   @default("Paper Trading")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  userId       String   @id
+  cash         Float    @default(1000000)
+  startingCash Float    @default(1000000)
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PriceAlert {
+  id          String    @id @default(cuid())
+  userId      String
+  symbol      String
+  targetPrice Float
+  direction   String
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TradeOrder {
+  id            String        @id @default(cuid())
+  userId        String
+  symbol        String
+  side          String
+  quantity      Int
+  orderType     String
+  status        String
+  limitPrice    Float?
+  executedPrice Float?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trades        ExecutedTrade[]
+}
+
+model ExecutedTrade {
+  id        String   @id @default(cuid())
+  orderId   String
+  userId    String
+  symbol    String
+  side      String
+  quantity  Int
+  price     Float
+  value     Float
+  createdAt DateTime @default(now())
+  order     TradeOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Holding {
+  userId    String
+  symbol    String
+  quantity  Int
+  avgPrice  Float
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, symbol])
+}
+
+model SipPlan {
+  id                  String   @id @default(cuid())
+  userId              String
+  fundCode            String
+  fundName            String
+  monthlyAmount       Float
+  expectedAnnualReturn Float
+  dayOfMonth          Int
+  startDate           DateTime
+  status              String   @default("ACTIVE")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+}
