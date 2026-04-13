@@ -3,12 +3,14 @@ import Link from "next/link";
 const links = {
   Product: [
     { label: "Dashboard", href: "/dashboard" },
+    { label: "Crypto exchange", href: "/crypto" },
     { label: "Trade terminal", href: "/dashboard/trade" },
     { label: "Portfolio", href: "/dashboard/portfolio" },
     { label: "Orders", href: "/dashboard/orders" },
   ],
   Markets: [
     { label: "Overview", href: "/dashboard" },
+    { label: "Crypto markets", href: "/crypto" },
     { label: "Trade", href: "/dashboard/trade" },
     { label: "Portfolio", href: "/dashboard/portfolio" },
   ],

@@ -83,6 +83,12 @@ export default function Navbar() {
           >
             Mutual Funds
           </Link>
+          <Link
+            href="/crypto"
+            className="text-gray-300 transition-colors hover:text-white"
+          >
+            Crypto
+          </Link>
         </div>
 
         {/* Right Section */}
