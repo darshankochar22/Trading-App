@@ -24,6 +24,10 @@ let overviewCache: {
 } | null = null;
 let overviewInflight: Promise<{ indices: MarketIndex[]; stocks: MarketStock[] }> | null = null;
 
+const MF_METRICS_TIMEOUT_MS = 12000;
+const MF_METRICS_CACHE_TTL_MS = 10 * 60 * 1000;
+const mfMetricsCache = new Map<string, { value: MutualFundMetrics | null; expiresAt: number }>();
+
 function nseHeaders(cookie?: string): HeadersInit {
   return {
     "User-Agent":
@@ -329,27 +333,49 @@ function getClosestNavAt(history: Array<{ date: string; nav: string }>, targetTi
 export async function fetchMutualFundMetrics(code: string): Promise<MutualFundMetrics | null> {
   const clean = code.trim();
   if (!/^\d+$/.test(clean)) return null;
-  const res = await fetch(`https://api.mfapi.in/mf/${encodeURIComponent(clean)}`, { cache: "no-store" });
-  if (!res.ok) return null;
-  const json = await res.json();
-  const data: Array<{ date: string; nav: string }> = Array.isArray(json?.data) ? json.data : [];
-  if (!data.length) return null;
-
-  const latest = data[0];
-  const latestNav = Number(latest.nav);
-  if (!Number.isFinite(latestNav) || latestNav <= 0) return null;
-
   const now = Date.now();
-  const nav1Y = getClosestNavAt(data, now - 365 * 24 * 60 * 60 * 1000);
-  const nav3Y = getClosestNavAt(data, now - 3 * 365 * 24 * 60 * 60 * 1000);
+  const cached = mfMetricsCache.get(clean);
+  if (cached && cached.expiresAt > now) {
+    return cached.value;
+  }
 
-  return {
-    code: clean,
-    latestNav,
-    navDate: latest.date,
-    return1Y: nav1Y && nav1Y > 0 ? ((latestNav - nav1Y) / nav1Y) * 100 : null,
-    return3Y: nav3Y && nav3Y > 0 ? ((latestNav - nav3Y) / nav3Y) * 100 : null,
-  };
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), MF_METRICS_TIMEOUT_MS);
+    const res = await fetch(`https://api.mfapi.in/mf/${encodeURIComponent(clean)}`, {
+      cache: "no-store",
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeout));
+    if (!res.ok) {
+      return cached?.value ?? null;
+    }
+    const json = await res.json();
+    const data: Array<{ date: string; nav: string }> = Array.isArray(json?.data) ? json.data : [];
+    if (!data.length) {
+      return cached?.value ?? null;
+    }
+
+    const latest = data[0];
+    const latestNav = Number(latest.nav);
+    if (!Number.isFinite(latestNav) || latestNav <= 0) {
+      return cached?.value ?? null;
+    }
+
+    const nav1Y = getClosestNavAt(data, now - 365 * 24 * 60 * 60 * 1000);
+    const nav3Y = getClosestNavAt(data, now - 3 * 365 * 24 * 60 * 60 * 1000);
+    const metrics: MutualFundMetrics = {
+      code: clean,
+      latestNav,
+      navDate: latest.date,
+      return1Y: nav1Y && nav1Y > 0 ? ((latestNav - nav1Y) / nav1Y) * 100 : null,
+      return3Y: nav3Y && nav3Y > 0 ? ((latestNav - nav3Y) / nav3Y) * 100 : null,
+    };
+    mfMetricsCache.set(clean, { value: metrics, expiresAt: now + MF_METRICS_CACHE_TTL_MS });
+    return metrics;
+  } catch {
+    // Upstream stalls are common; keep last known metric if available.
+    return cached?.value ?? null;
+  }
 }
 
 function formatNseDate(date: Date): string {

@@ -15,6 +15,7 @@ const links = {
   Company: [
     { label: "Home", href: "/" },
     { label: "Dashboard", href: "/dashboard" },
+    { label: "Architecture", href: "/dashboard/architecture" },
   ],
   Legal: [
     { label: "Terms", href: "/terms" },

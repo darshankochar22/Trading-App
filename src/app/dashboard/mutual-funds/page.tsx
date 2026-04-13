@@ -29,12 +29,16 @@ type SipPlan = {
 export default function MutualFundsPage() {
   const [query, setQuery] = useState("");
   const [funds, setFunds] = useState<MutualFundItem[]>([]);
-  const [sortBy, setSortBy] = useState<"name-asc" | "name-desc" | "code-asc" | "code-desc">("name-asc");
+  const [sortBy, setSortBy] = useState<
+    "name-asc" | "name-desc" | "code-asc" | "code-desc"
+  >("name-asc");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sipError, setSipError] = useState<string | null>(null);
   const [sipSuccess, setSipSuccess] = useState<string | null>(null);
-  const [fundMetrics, setFundMetrics] = useState<Record<string, MutualFundMetrics>>({});
+  const [fundMetrics, setFundMetrics] = useState<
+    Record<string, MutualFundMetrics>
+  >({});
 
   const [monthlySip, setMonthlySip] = useState("5000");
   const [annualReturn, setAnnualReturn] = useState("12");
@@ -45,7 +49,9 @@ export default function MutualFundsPage() {
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
   const [upiOpen, setUpiOpen] = useState(false);
   const [upiPin, setUpiPin] = useState("");
-  const [upiStep, setUpiStep] = useState<"pin" | "processing" | "success">("pin");
+  const [upiStep, setUpiStep] = useState<"pin" | "processing" | "success">(
+    "pin",
+  );
   const [upiTxnId, setUpiTxnId] = useState("");
 
   useEffect(() => {
@@ -54,16 +60,22 @@ export default function MutualFundsPage() {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch(`/api/market/mutual-funds?limit=30&q=${encodeURIComponent(query)}`, {
-          cache: "no-store",
-        });
+        const res = await fetch(
+          `/api/market/mutual-funds?limit=30&q=${encodeURIComponent(query)}`,
+          {
+            cache: "no-store",
+          },
+        );
         const json: MfApi = await res.json();
-        if (!res.ok || !json.ok) throw new Error(json.message ?? "Unable to fetch mutual funds");
+        if (!res.ok || !json.ok)
+          throw new Error(json.message ?? "Unable to fetch mutual funds");
         if (!active) return;
         setFunds(json.data ?? []);
       } catch (e) {
         if (!active) return;
-        setError(e instanceof Error ? e.message : "Unable to fetch mutual funds");
+        setError(
+          e instanceof Error ? e.message : "Unable to fetch mutual funds",
+        );
       } finally {
         if (active) setLoading(false);
       }
@@ -75,7 +87,10 @@ export default function MutualFundsPage() {
   }, [query]);
 
   useEffect(() => {
-    const codes = funds.map((f) => f.code).filter(Boolean).slice(0, 30);
+    const codes = funds
+      .map((f) => f.code)
+      .filter(Boolean)
+      .slice(0, 30);
     if (!codes.length) {
       setFundMetrics({});
       return;
@@ -83,9 +98,12 @@ export default function MutualFundsPage() {
     let active = true;
     async function loadMetrics() {
       try {
-        const res = await fetch(`/api/market/mutual-funds/metrics?codes=${encodeURIComponent(codes.join(","))}`, {
-          cache: "no-store",
-        });
+        const res = await fetch(
+          `/api/market/mutual-funds/metrics?codes=${encodeURIComponent(codes.join(","))}`,
+          {
+            cache: "no-store",
+          },
+        );
         const json: MfMetricsApi = await res.json();
         if (!active || !res.ok || !json.ok) return;
         setFundMetrics((prev) => ({ ...prev, ...(json.data ?? {}) }));
@@ -122,9 +140,12 @@ export default function MutualFundsPage() {
     let active = true;
     async function loadSipMetrics() {
       try {
-        const res = await fetch(`/api/market/mutual-funds/metrics?codes=${encodeURIComponent(codes.join(","))}`, {
-          cache: "no-store",
-        });
+        const res = await fetch(
+          `/api/market/mutual-funds/metrics?codes=${encodeURIComponent(codes.join(","))}`,
+          {
+            cache: "no-store",
+          },
+        );
         const json: MfMetricsApi = await res.json();
         if (!active || !res.ok || !json.ok) return;
         setFundMetrics((prev) => ({ ...prev, ...(json.data ?? {}) }));
@@ -139,15 +160,25 @@ export default function MutualFundsPage() {
   }, [sipPlans]);
 
   function formatReturn(value: number | null | undefined) {
-    if (value === null || value === undefined || !Number.isFinite(value)) return "--";
+    if (value === null || value === undefined || !Number.isFinite(value))
+      return "--";
     const sign = value > 0 ? "+" : "";
     return `${sign}${value.toFixed(2)}%`;
   }
 
+  function returnTone(value: number | null | undefined) {
+    if (!Number.isFinite(value ?? NaN)) return "text-gray-700";
+    if ((value ?? 0) > 0) return "text-emerald-700";
+    if ((value ?? 0) < 0) return "text-rose-700";
+    return "text-gray-700";
+  }
+
   const sortedFunds = useMemo(() => {
     const list = [...funds];
-    const byName = (a: MutualFundItem, b: MutualFundItem) => a.schemeName.localeCompare(b.schemeName);
-    const byCode = (a: MutualFundItem, b: MutualFundItem) => a.code.localeCompare(b.code);
+    const byName = (a: MutualFundItem, b: MutualFundItem) =>
+      a.schemeName.localeCompare(b.schemeName);
+    const byCode = (a: MutualFundItem, b: MutualFundItem) =>
+      a.code.localeCompare(b.code);
     if (sortBy === "name-asc") return list.sort(byName);
     if (sortBy === "name-desc") return list.sort((a, b) => byName(b, a));
     if (sortBy === "code-asc") return list.sort(byCode);
@@ -186,7 +217,8 @@ export default function MutualFundsPage() {
         }),
       });
       const json = await res.json();
-      if (!res.ok || !json.ok) throw new Error(json.message ?? "Unable to create SIP plan");
+      if (!res.ok || !json.ok)
+        throw new Error(json.message ?? "Unable to create SIP plan");
       setUpiStep("success");
       setSipSuccess(`SIP started for ${selectedFund.schemeName}`);
       const listRes = await fetch("/api/user/sips", { cache: "no-store" });
@@ -206,7 +238,9 @@ export default function MutualFundsPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, status }),
     });
-    setSipPlans((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
+    setSipPlans((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, status } : p)),
+    );
   }
 
   function pressPinDigit(digit: string) {
@@ -228,15 +262,27 @@ export default function MutualFundsPage() {
           <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-xl">
             {upiStep === "pin" ? (
               <>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">UPI Payment</p>
-                <h3 className="mt-2 text-lg font-semibold text-gray-900">Approve SIP mandate</h3>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  UPI Payment
+                </p>
+                <h3 className="mt-2 text-lg font-semibold text-gray-900">
+                  Approve SIP mandate
+                </h3>
                 <p className="mt-1 text-sm text-gray-600">
-                  Fund: <span className="font-medium text-gray-900">{selectedFund?.schemeName}</span>
+                  Fund:{" "}
+                  <span className="font-medium text-gray-900">
+                    {selectedFund?.schemeName}
+                  </span>
                 </p>
                 <p className="mt-1 text-sm text-gray-600">
-                  Amount: <span className="font-medium text-gray-900">₹{Number(monthlySip || 0).toLocaleString("en-IN")}</span>
+                  Amount:{" "}
+                  <span className="font-medium text-gray-900">
+                    ₹{Number(monthlySip || 0).toLocaleString("en-IN")}
+                  </span>
                 </p>
-                <p className="mt-1 text-xs text-gray-500">Enter UPI PIN to continue (dummy flow, always success).</p>
+                <p className="mt-1 text-xs text-gray-500">
+                  Enter UPI PIN to continue (dummy flow, always success).
+                </p>
 
                 <div className="mt-4">
                   <div className="flex items-center justify-center gap-2">
@@ -255,16 +301,18 @@ export default function MutualFundsPage() {
                   </div>
 
                   <div className="mx-auto mt-4 grid w-full max-w-[260px] grid-cols-3 gap-2">
-                    {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit) => (
-                      <button
-                        key={`key-${digit}`}
-                        type="button"
-                        onClick={() => pressPinDigit(digit)}
-                        className="rounded-lg border border-gray-200 bg-white py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
-                      >
-                        {digit}
-                      </button>
-                    ))}
+                    {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map(
+                      (digit) => (
+                        <button
+                          key={`key-${digit}`}
+                          type="button"
+                          onClick={() => pressPinDigit(digit)}
+                          className="rounded-lg border border-gray-200 bg-white py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
+                        >
+                          {digit}
+                        </button>
+                      ),
+                    )}
                     <button
                       type="button"
                       onClick={clearPin}
@@ -311,8 +359,12 @@ export default function MutualFundsPage() {
             {upiStep === "processing" ? (
               <div className="py-6 text-center">
                 <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600" />
-                <p className="mt-3 text-sm font-medium text-gray-900">Processing payment...</p>
-                <p className="mt-1 text-xs text-gray-500">Please do not close this window.</p>
+                <p className="mt-3 text-sm font-medium text-gray-900">
+                  Processing payment...
+                </p>
+                <p className="mt-1 text-xs text-gray-500">
+                  Please do not close this window.
+                </p>
               </div>
             ) : null}
 
@@ -321,8 +373,12 @@ export default function MutualFundsPage() {
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-md shadow-blue-200">
                   ✓
                 </div>
-                <p className="mt-3 text-sm font-semibold text-gray-900">Payment successful</p>
-                <p className="mt-1 text-xs text-gray-500">UPI Ref: {upiTxnId}</p>
+                <p className="mt-3 text-sm font-semibold text-gray-900">
+                  Payment successful
+                </p>
+                <p className="mt-1 text-xs text-gray-500">
+                  UPI Ref: {upiTxnId}
+                </p>
               </div>
             ) : null}
           </div>
@@ -330,24 +386,44 @@ export default function MutualFundsPage() {
       ) : null}
 
       <div className="rounded-2xl border border-gray-200 bg-black p-6 text-white shadow-sm">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-200">Mutual Funds</p>
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-200">
+          Mutual Funds
+        </p>
         <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold sm:text-3xl">SIP Planner & Fund Discovery</h1>
+            <h1 className="text-2xl font-semibold sm:text-3xl">
+              SIP Planner & Fund Discovery
+            </h1>
             <p className="mt-1 text-sm text-slate-200">
-              Professional mutual fund section with SIP projection and searchable fund universe.
+              Professional mutual fund section with SIP projection and
+              searchable fund universe.
             </p>
           </div>
-          <Link href="/dashboard" className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm hover:bg-white/10">
-            Back to Dashboard
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/dashboard/architecture"
+              className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
+            >
+              Architecture
+            </Link>
+            <Link
+              href="/dashboard"
+              className="rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
+            >
+              Back to Dashboard
+            </Link>
+          </div>
         </div>
       </div>
 
       <section className="mt-6 grid gap-4 lg:grid-cols-[380px_1fr]">
         <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-gray-900">SIP Calculator</h2>
-          <p className="mt-1 text-xs text-gray-500">Estimate long-term corpus with monthly SIP.</p>
+          <h2 className="text-sm font-semibold text-gray-900">
+            SIP Calculator
+          </h2>
+          <p className="mt-1 text-xs text-gray-500">
+            Estimate long-term corpus with monthly SIP.
+          </p>
 
           <div className="mt-4 space-y-3">
             <label className="block text-xs font-medium text-gray-600">
@@ -388,7 +464,10 @@ export default function MutualFundsPage() {
 
           {selectedFund ? (
             <p className="mt-3 text-xs text-gray-600">
-              Selected for SIP setup: <span className="font-medium text-gray-900">{selectedFund.schemeName}</span>
+              Selected for SIP setup:{" "}
+              <span className="font-medium text-gray-900">
+                {selectedFund.schemeName}
+              </span>
             </p>
           ) : null}
         </article>
@@ -396,8 +475,12 @@ export default function MutualFundsPage() {
         <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-sm font-semibold text-gray-900">Fund Explorer</h2>
-              <p className="mt-1 text-xs text-gray-500">Search across mutual fund schemes.</p>
+              <h2 className="text-sm font-semibold text-gray-900">
+                Fund Explorer
+              </h2>
+              <p className="mt-1 text-xs text-gray-500">
+                Search across mutual fund schemes.
+              </p>
             </div>
             <div className="flex w-full max-w-xl gap-2">
               <input
@@ -409,7 +492,13 @@ export default function MutualFundsPage() {
               <select
                 value={sortBy}
                 onChange={(e) =>
-                  setSortBy((e.target.value as "name-asc" | "name-desc" | "code-asc" | "code-desc") ?? "name-asc")
+                  setSortBy(
+                    (e.target.value as
+                      | "name-asc"
+                      | "name-desc"
+                      | "code-asc"
+                      | "code-desc") ?? "name-asc",
+                  )
                 }
                 className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
               >
@@ -421,12 +510,25 @@ export default function MutualFundsPage() {
             </div>
           </div>
 
-          {error ? <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
-          {sipError ? <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{sipError}</p> : null}
-          {sipSuccess ? <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{sipSuccess}</p> : null}
+          {error ? (
+            <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {error}
+            </p>
+          ) : null}
+          {sipError ? (
+            <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              {sipError}
+            </p>
+          ) : null}
+          {sipSuccess ? (
+            <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+              {sipSuccess}
+            </p>
+          ) : null}
           {isAuthed === false ? (
             <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
-              Login required for SIP actions. You can still browse and sort funds.
+              Login required for SIP actions. You can still browse and sort
+              funds.
             </p>
           ) : null}
 
@@ -445,7 +547,10 @@ export default function MutualFundsPage() {
               <tbody>
                 {loading ? (
                   Array.from({ length: 8 }).map((_, idx) => (
-                    <tr key={`mf-loading-${idx}`} className="border-t border-gray-100">
+                    <tr
+                      key={`mf-loading-${idx}`}
+                      className="border-t border-gray-100"
+                    >
                       <td className="py-3">
                         <div className="h-3 w-56 animate-pulse rounded bg-gray-200" />
                       </td>
@@ -469,23 +574,25 @@ export default function MutualFundsPage() {
                     const metric = fundMetrics[f.code];
                     return (
                       <tr key={f.code} className="border-t border-gray-100">
-                        <td className="py-2 font-medium text-gray-900">{f.schemeName}</td>
+                        <td className="py-2 font-medium text-gray-900">
+                          {f.schemeName}
+                        </td>
                         <td className="py-2 text-gray-600">{f.code}</td>
                         <td className="py-2 text-right text-gray-700">
                           {metric ? `₹${metric.latestNav.toFixed(2)}` : "--"}
-                          {metric?.navDate ? <p className="text-[10px] text-gray-500">{metric.navDate}</p> : null}
+                          {metric?.navDate ? (
+                            <p className="text-[10px] text-gray-500">
+                              {metric.navDate}
+                            </p>
+                          ) : null}
                         </td>
                         <td
-                          className={`py-2 text-right ${
-                            (metric?.return1Y ?? 0) > 0 ? "text-emerald-700" : (metric?.return1Y ?? 0) < 0 ? "text-rose-700" : "text-gray-700"
-                          }`}
+                          className={`py-2 text-right ${returnTone(metric?.return1Y)}`}
                         >
                           {formatReturn(metric?.return1Y)}
                         </td>
                         <td
-                          className={`py-2 text-right ${
-                            (metric?.return3Y ?? 0) > 0 ? "text-emerald-700" : (metric?.return3Y ?? 0) < 0 ? "text-rose-700" : "text-gray-700"
-                          }`}
+                          className={`py-2 text-right ${returnTone(metric?.return3Y)}`}
                         >
                           {formatReturn(metric?.return3Y)}
                         </td>
@@ -542,25 +649,40 @@ export default function MutualFundsPage() {
                       <p className="font-medium text-gray-900">{p.fundName}</p>
                       <p className="text-xs text-gray-500">{p.fundCode}</p>
                     </td>
-                    <td className="py-2">₹{p.monthlyAmount.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</td>
-                    <td className="py-2 text-gray-700">{fundMetrics[p.fundCode] ? `₹${fundMetrics[p.fundCode].latestNav.toFixed(2)}` : "--"}</td>
-                    <td
-                      className={`py-2 ${
-                        (fundMetrics[p.fundCode]?.return1Y ?? 0) > 0
-                          ? "text-emerald-700"
-                          : (fundMetrics[p.fundCode]?.return1Y ?? 0) < 0
-                            ? "text-rose-700"
-                            : "text-gray-700"
-                      }`}
-                    >
-                      {formatReturn(fundMetrics[p.fundCode]?.return1Y)}
+                    <td className="py-2">
+                      ₹
+                      {p.monthlyAmount.toLocaleString("en-IN", {
+                        maximumFractionDigits: 0,
+                      })}
                     </td>
-                    <td className="py-2 text-gray-700">{p.expectedAnnualReturn.toFixed(1)}%</td>
+                    <td className="py-2 text-gray-700">
+                      {fundMetrics[p.fundCode]
+                        ? `₹${fundMetrics[p.fundCode].latestNav.toFixed(2)}`
+                        : "--"}
+                    </td>
+                    <td
+                      className={`py-2 ${returnTone(fundMetrics[p.fundCode]?.return1Y)}`}
+                    >
+                      {Number.isFinite(
+                        fundMetrics[p.fundCode]?.return1Y ?? NaN,
+                      ) ? (
+                        formatReturn(fundMetrics[p.fundCode]?.return1Y)
+                      ) : (
+                        <span className="text-gray-600">
+                          {p.expectedAnnualReturn.toFixed(1)}% (est.)
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-2 text-gray-700">
+                      {p.expectedAnnualReturn.toFixed(1)}%
+                    </td>
                     <td className="py-2">{p.dayOfMonth}</td>
                     <td className="py-2">
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                          p.status === "ACTIVE" ? "bg-emerald-50 text-emerald-700" : "bg-gray-100 text-gray-600"
+                          p.status === "ACTIVE"
+                            ? "bg-emerald-50 text-emerald-700"
+                            : "bg-gray-100 text-gray-600"
                         }`}
                       >
                         {p.status}
@@ -569,7 +691,12 @@ export default function MutualFundsPage() {
                     <td className="py-2 text-right">
                       <button
                         type="button"
-                        onClick={() => void toggleSip(p.id, p.status === "ACTIVE" ? "PAUSED" : "ACTIVE")}
+                        onClick={() =>
+                          void toggleSip(
+                            p.id,
+                            p.status === "ACTIVE" ? "PAUSED" : "ACTIVE",
+                          )
+                        }
                         className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-900 hover:bg-gray-50"
                       >
                         {p.status === "ACTIVE" ? "Pause" : "Resume"}
@@ -591,4 +718,3 @@ export default function MutualFundsPage() {
     </main>
   );
 }
-

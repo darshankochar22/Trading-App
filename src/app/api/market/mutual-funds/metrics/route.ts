@@ -16,12 +16,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: true as const, data: {} as Record<string, MutualFundMetrics> });
   }
 
-  const settled = await Promise.allSettled(codes.map((code) => fetchMutualFundMetrics(code)));
   const data: Record<string, MutualFundMetrics> = {};
-  settled.forEach((item, idx) => {
-    if (item.status !== "fulfilled" || !item.value) return;
-    data[codes[idx]] = item.value;
-  });
+  const batchSize = 5;
+  for (let i = 0; i < codes.length; i += batchSize) {
+    const chunk = codes.slice(i, i + batchSize);
+    const settled = await Promise.allSettled(chunk.map((code) => fetchMutualFundMetrics(code)));
+    settled.forEach((item, idx) => {
+      if (item.status !== "fulfilled" || !item.value) return;
+      data[chunk[idx]] = item.value;
+    });
+  }
 
   return NextResponse.json({ ok: true as const, data, asOf: new Date().toISOString() });
 }
