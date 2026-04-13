@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { jsonError } from "@/lib/api/response";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, newSessionExpiry, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { buildSessionCookieOptions } from "@/lib/sessionCookie";
 
 export const dynamic = "force-dynamic";
 
@@ -44,13 +45,7 @@ export async function POST(request: NextRequest) {
   await prisma.session.create({ data: { token, userId: user.id, expiresAt } });
 
   const res = NextResponse.json({ ok: true as const });
-  res.cookies.set(SESSION_COOKIE_NAME, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    expires: expiresAt,
-  });
+  res.cookies.set(SESSION_COOKIE_NAME, token, buildSessionCookieOptions(request, expiresAt));
   return res;
 }
 
