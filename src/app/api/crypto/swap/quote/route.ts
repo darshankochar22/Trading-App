@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchBinance, sanitizeSymbol } from "@/lib/binance";
+import { getSpotPrice } from "@/lib/cryptoMarket";
+import { sanitizeSymbol } from "@/lib/binance";
 
 export const dynamic = "force-dynamic";
-
-type PriceResp = { symbol: string; price: string };
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -15,15 +14,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false as const, message: "Amount must be positive" }, { status: 400 });
   }
 
-  const pair = `${fromAsset}${toAsset}`;
-
   try {
-    const priceResp = (await fetchBinance(`/api/v3/ticker/price?symbol=${encodeURIComponent(pair)}`)) as PriceResp;
-    const rate = Number(priceResp.price);
+    const result = await getSpotPrice(fromAsset, toAsset);
+    const rate = result.rate;
     const outputAmount = amount * rate;
     return NextResponse.json({
       ok: true as const,
-      data: { pair, rate, inputAmount: amount, outputAmount },
+      provider: result.provider,
+      data: { pair: result.pair, rate, inputAmount: amount, outputAmount },
     });
   } catch (error) {
     return NextResponse.json(

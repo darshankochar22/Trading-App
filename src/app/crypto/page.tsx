@@ -72,6 +72,9 @@ export default function CryptoPage() {
   const [swapTo, setSwapTo] = useState("USDT");
   const [swapAmount, setSwapAmount] = useState("1");
   const [swapResult, setSwapResult] = useState<string | null>(null);
+  const [marketError, setMarketError] = useState<string | null>(null);
+  const [chartError, setChartError] = useState<string | null>(null);
+  const [providerLabel, setProviderLabel] = useState<string>("binance");
 
   useEffect(() => {
     let active = true;
@@ -79,8 +82,17 @@ export default function CryptoPage() {
       try {
         const res = await fetch("/api/crypto/markets?quote=USDT&limit=30", { cache: "no-store" });
         const json = await res.json();
-        if (!active || !json?.ok) return;
+        if (!active) return;
+        if (!json?.ok) {
+          setMarketError(json?.message ?? "Unable to load markets");
+          return;
+        }
         setMarkets(json.data ?? []);
+        setProviderLabel(String(json.provider ?? "binance"));
+        setMarketError(null);
+      } catch (error) {
+        if (!active) return;
+        setMarketError(error instanceof Error ? error.message : "Unable to load markets");
       } finally {
         if (active) setLoading(false);
       }
@@ -94,12 +106,23 @@ export default function CryptoPage() {
   useEffect(() => {
     let active = true;
     async function loadKlines() {
-      const res = await fetch(`/api/crypto/klines?symbol=${encodeURIComponent(selectedSymbol)}&interval=${interval}&limit=160`, {
-        cache: "no-store",
-      });
-      const json = await res.json();
-      if (!active || !json?.ok) return;
-      setKlines(json.data ?? []);
+      try {
+        const res = await fetch(`/api/crypto/klines?symbol=${encodeURIComponent(selectedSymbol)}&interval=${interval}&limit=160`, {
+          cache: "no-store",
+        });
+        const json = await res.json();
+        if (!active) return;
+        if (!json?.ok) {
+          setChartError(json?.message ?? "Unable to load chart");
+          return;
+        }
+        setKlines(json.data ?? []);
+        setProviderLabel(String(json.provider ?? "binance"));
+        setChartError(null);
+      } catch (error) {
+        if (!active) return;
+        setChartError(error instanceof Error ? error.message : "Unable to load chart");
+      }
     }
     void loadKlines();
     return () => {
@@ -174,6 +197,7 @@ export default function CryptoPage() {
             <span className="rounded-full border border-white/20 px-3 py-1">Frontend route: /crypto</span>
             <span className="rounded-full border border-white/20 px-3 py-1">APIs: /api/crypto/*</span>
             <span className="rounded-full border border-white/20 px-3 py-1">User auth: shared /api/auth/me</span>
+            <span className="rounded-full border border-white/20 px-3 py-1">Data provider: {providerLabel}</span>
           </div>
         </section>
 
@@ -204,6 +228,7 @@ export default function CryptoPage() {
               </div>
             </div>
             <div className="mt-4">{loading ? <div className="h-72 animate-pulse rounded-lg bg-gray-100" /> : <MiniLineChart data={klines} />}</div>
+            {chartError ? <p className="mt-2 text-xs text-rose-700">{chartError}</p> : null}
             {selectedMarket ? (
               <p className="mt-3 text-sm text-gray-700">
                 Last: <span className="font-medium">${selectedMarket.price.toFixed(4)}</span> | 24h:{" "}
@@ -272,6 +297,7 @@ export default function CryptoPage() {
               Architecture
             </Link>
           </div>
+          {marketError ? <p className="mt-2 text-xs text-rose-700">{marketError}</p> : null}
           <div className="mt-3 overflow-x-auto">
             <table className="w-full min-w-[760px] text-left text-sm">
               <thead className="text-xs uppercase tracking-wide text-gray-500">
