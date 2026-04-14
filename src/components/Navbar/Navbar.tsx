@@ -38,7 +38,9 @@ export default function Navbar() {
       />
       <div className="navbar-inner relative grid h-16 w-full grid-cols-[1fr_auto_1fr] items-center">
         {/* Logo Section */}
-        <span className="justify-self-start text-sm font-semibold text-white">Stellar</span>
+        <span className="justify-self-start text-sm font-semibold text-white">
+          Stellar
+        </span>
         {/* Navigation Links */}
         <div className="flex items-center justify-center gap-6 text-sm md:gap-8">
           <Link
