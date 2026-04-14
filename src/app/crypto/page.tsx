@@ -32,28 +32,125 @@ type CryptoOrder = {
   createdAt: string;
 };
 
-function MiniLineChart({ data }: { data: Kline[] }) {
-  const points = useMemo(() => {
-    if (!data.length) return "";
-    const width = 1000;
-    const height = 320;
-    const closes = data.map((d) => d.close);
-    const min = Math.min(...closes);
-    const max = Math.max(...closes);
-    const span = max - min || 1;
-    return data
-      .map((d, i) => {
-        const x = (i / Math.max(data.length - 1, 1)) * width;
-        const y = height - ((d.close - min) / span) * height;
-        return `${x},${y}`;
-      })
-      .join(" ");
-  }, [data]);
+type TradingCandlesProps = {
+  data: Kline[];
+  visibleCount: number;
+  hoverOpenTime: number | null;
+  onHoverCandle: (candle: Kline | null) => void;
+};
+
+function TradingCandles({
+  data,
+  visibleCount,
+  hoverOpenTime,
+  onHoverCandle,
+}: TradingCandlesProps) {
+  const chart = useMemo(() => {
+    const candles = data.slice(-visibleCount);
+    if (!candles.length) {
+      return { candles: [], width: 1200, height: 460, lines: [] as number[] };
+    }
+    const width = 1200;
+    const height = 460;
+    const pad = 22;
+    const max = Math.max(...candles.map((d) => d.high));
+    const min = Math.min(...candles.map((d) => d.low));
+    const span = Math.max(max - min, 1e-9);
+    const lines = [0.15, 0.35, 0.55, 0.75].map((r) => pad + (height - pad * 2) * r);
+
+    const y = (v: number) => pad + ((max - v) / span) * (height - pad * 2);
+    const slot = (width - pad * 2) / candles.length;
+    const bodyWidth = Math.max(3, Math.min(10, slot * 0.6));
+
+    return {
+      width,
+      height,
+      lines,
+      candles: candles.map((d, i) => {
+        const x = pad + i * slot + slot / 2;
+        const openY = y(d.open);
+        const closeY = y(d.close);
+        const highY = y(d.high);
+        const lowY = y(d.low);
+        const up = d.close >= d.open;
+        return {
+          key: `${d.openTime}-${i}`,
+          source: d,
+          x,
+          openY,
+          closeY,
+          highY,
+          lowY,
+          bodyY: Math.min(openY, closeY),
+          bodyH: Math.max(Math.abs(closeY - openY), 2),
+          bodyWidth,
+          color: up ? "#059669" : "#dc2626",
+          fill: up ? "rgba(5,150,105,0.16)" : "rgba(220,38,38,0.16)",
+        };
+      }),
+    };
+  }, [data, visibleCount]);
+
+  function emitHover(clientX: number, rect: DOMRect) {
+    if (!chart.candles.length) {
+      onHoverCandle(null);
+      return;
+    }
+    const x = clientX - rect.left;
+    const normalized = Math.max(0, Math.min(1, x / Math.max(rect.width, 1)));
+    const idx = Math.round(normalized * (chart.candles.length - 1));
+    onHoverCandle(chart.candles[idx]?.source ?? null);
+  }
 
   return (
-    <svg viewBox="0 0 1000 320" className="h-72 w-full rounded-lg border border-gray-200 bg-white">
-      <polyline fill="none" stroke="#111827" strokeWidth="2.5" points={points} />
-    </svg>
+    <div className="relative">
+      <svg
+        viewBox={`0 0 ${chart.width} ${chart.height}`}
+        className="h-104 w-full touch-none rounded-xl border border-gray-200 bg-white"
+        onMouseLeave={() => onHoverCandle(null)}
+        onTouchEnd={() => onHoverCandle(null)}
+      >
+        {chart.lines.map((line, idx) => (
+          <line key={`grid-${idx}`} x1={12} y1={line} x2={chart.width - 12} y2={line} stroke="#e5e7eb" strokeWidth="1" strokeDasharray="4 4" />
+        ))}
+        {chart.candles.map((c) => (
+          <g key={c.key}>
+            <line x1={c.x} y1={c.highY} x2={c.x} y2={c.lowY} stroke={c.color} strokeWidth="1.4" />
+            <rect
+              x={c.x - c.bodyWidth / 2}
+              y={c.bodyY}
+              width={c.bodyWidth}
+              height={c.bodyH}
+              fill={c.fill}
+              stroke={c.color}
+              strokeWidth="1.2"
+              rx="1"
+            />
+          </g>
+        ))}
+        {hoverOpenTime ? (
+          <line
+            x1={chart.candles.find((c) => c.source.openTime === hoverOpenTime)?.x ?? -10}
+            y1={12}
+            x2={chart.candles.find((c) => c.source.openTime === hoverOpenTime)?.x ?? -10}
+            y2={chart.height - 12}
+            stroke="#9ca3af"
+            strokeWidth="1"
+            strokeDasharray="3 3"
+          />
+        ) : null}
+      </svg>
+      <div
+        className="absolute inset-0"
+        onMouseMove={(e) => emitHover(e.clientX, e.currentTarget.getBoundingClientRect())}
+        onTouchStart={(e) => {
+          if (e.touches[0]) emitHover(e.touches[0].clientX, e.currentTarget.getBoundingClientRect());
+        }}
+        onTouchMove={(e) => {
+          if (e.touches[0]) emitHover(e.touches[0].clientX, e.currentTarget.getBoundingClientRect());
+        }}
+      />
+    </div>
   );
 }
 
@@ -76,6 +173,8 @@ export default function CryptoPage() {
   const [marketError, setMarketError] = useState<string | null>(null);
   const [chartError, setChartError] = useState<string | null>(null);
   const [providerLabel, setProviderLabel] = useState<string>("binance");
+  const [visibleCount, setVisibleCount] = useState(120);
+  const [hoveredKline, setHoveredKline] = useState<Kline | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -146,6 +245,13 @@ export default function CryptoPage() {
   }, []);
 
   const selectedMarket = markets.find((m) => m.symbol === selectedSymbol) ?? null;
+  const latestKline = klines.length ? klines[klines.length - 1] : null;
+  const previousKline = klines.length > 1 ? klines[klines.length - 2] : null;
+  const activeKline = hoveredKline ?? latestKline;
+  const intervalChangePct =
+    activeKline && previousKline && previousKline.close !== 0
+      ? ((activeKline.close - previousKline.close) / previousKline.close) * 100
+      : 0;
 
   async function placeOrder() {
     setOrderMessage(null);
@@ -202,11 +308,32 @@ export default function CryptoPage() {
           </div>
         </section>
 
-        <section className="mt-6 grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+        <section className="mt-6 grid gap-4 lg:grid-cols-[2fr_1fr]">
           <article className="rounded-2xl border border-gray-200 bg-white p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold">Market Graph</h2>
+              <h2 className="text-lg font-semibold">Trading Chart</h2>
               <div className="flex gap-2">
+                <div className="flex items-center rounded-lg border border-gray-300 bg-white">
+                  <button
+                    type="button"
+                    onClick={() => setVisibleCount((v) => Math.min(200, v + 20))}
+                    className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    title="Zoom out"
+                  >
+                    -
+                  </button>
+                  <span className="border-x border-gray-300 px-2 text-xs text-gray-600">
+                    {visibleCount}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setVisibleCount((v) => Math.max(40, v - 20))}
+                    className="px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    title="Zoom in"
+                  >
+                    +
+                  </button>
+                </div>
                 <select
                   value={selectedSymbol}
                   onChange={(e) => setSelectedSymbol(e.target.value)}
@@ -228,16 +355,53 @@ export default function CryptoPage() {
                 </select>
               </div>
             </div>
-            <div className="mt-4">{loading ? <div className="h-72 animate-pulse rounded-lg bg-gray-100" /> : <MiniLineChart data={klines} />}</div>
+            <div className="mt-4">
+              {loading ? (
+                <div className="h-104 animate-pulse rounded-lg bg-gray-100" />
+              ) : (
+                <TradingCandles
+                  data={klines}
+                  visibleCount={visibleCount}
+                  hoverOpenTime={hoveredKline?.openTime ?? null}
+                  onHoverCandle={setHoveredKline}
+                />
+              )}
+            </div>
             {chartError ? <p className="mt-2 text-xs text-rose-700">{chartError}</p> : null}
-            {selectedMarket ? (
-              <p className="mt-3 text-sm text-gray-700">
-                Last: <span className="font-medium">${selectedMarket.price.toFixed(4)}</span> | 24h:{" "}
-                <span className={selectedMarket.changePercent24h >= 0 ? "text-emerald-700" : "text-rose-700"}>
-                  {selectedMarket.changePercent24h.toFixed(2)}%
-                </span>
-              </p>
-            ) : null}
+            <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                <p className="text-[11px] uppercase tracking-wide text-gray-500">Last</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {selectedMarket ? `$${selectedMarket.price.toFixed(4)}` : "--"}
+                </p>
+              </div>
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                <p className="text-[11px] uppercase tracking-wide text-gray-500">24h Move</p>
+                <p className={`text-sm font-semibold ${selectedMarket && selectedMarket.changePercent24h >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
+                  {selectedMarket ? `${selectedMarket.changePercent24h.toFixed(2)}%` : "--"}
+                </p>
+              </div>
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                <p className="text-[11px] uppercase tracking-wide text-gray-500">O / H / L / C</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {activeKline
+                    ? `${activeKline.open.toFixed(2)} / ${activeKline.high.toFixed(2)} / ${activeKline.low.toFixed(2)} / ${activeKline.close.toFixed(2)}`
+                    : "--"}
+                </p>
+              </div>
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                <p className="text-[11px] uppercase tracking-wide text-gray-500">Interval Move</p>
+                <p className={`text-sm font-semibold ${intervalChangePct >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
+                  {activeKline ? `${intervalChangePct.toFixed(2)}%` : "--"}
+                </p>
+              </div>
+              <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                <p className="text-[11px] uppercase tracking-wide text-gray-500">Candle Volume</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  {activeKline ? activeKline.volume.toLocaleString("en-IN", { maximumFractionDigits: 2 }) : "--"}
+                </p>
+              </div>
+            </div>
           </article>
 
           <article className="rounded-2xl border border-gray-200 bg-white p-5">
